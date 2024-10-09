@@ -24,8 +24,20 @@ def get_hero(id):
     hero = Hero.query.get(id)
     if not hero:
         return jsonify({"error": "Hero not found"}), 404
-    hero_powers = HeroPower.query.filter_by(hero_id=id).all()
-    return jsonify(hero.to_dict(hero_powers=hero_powers))
+    return jsonify({
+        "id": hero.id,
+        "name": hero.name,
+        "super_name": hero.super_name,
+        "hero_powers": [{
+            "id": hp.id,
+            "strength": hp.strength,
+            "power": {
+                "id": hp.power.id,
+                "name": hp.power.name,
+                "description": hp.power.description
+            }
+        } for hp in hero.hero_powers]
+    }), 200
 
 # Route to get all powers
 @app.route('/powers', methods=['GET'])

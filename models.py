@@ -40,7 +40,7 @@ class Power(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
     description = db.Column(db.String, nullable=False)
-    heroes = db.relationship('Hero', backref='power')
+    heroes = db.relationship('HeroPower', back_populates='power',cascade = "all, delete-orphan")
 
     @validates('description')
     def validate_description(self, key, description):
