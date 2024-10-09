@@ -1,9 +1,19 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import validates
+from sqlalchemy_serializer import SerializerMixin
+from sqlalchemy import MetaData
 
-db = SQLAlchemy()
 
-class Hero(db.Model):
+metadata = MetaData(naming_convention={
+     "pk": "pk_%(table_name)s",
+    "fk": "fk_%(table_name)s_%(column_0_name)s",
+    "uq": "uq_%(table_name)s_%(column_0_name)s",
+    "ck": "ck_%(table_name)s_%(constraint_name)s"
+})
+
+db = SQLAlchemy(metadata=metadata)
+
+class Hero(db.Model, SerializerMixin):
     __tablename__ = 'heroes'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
@@ -25,11 +35,12 @@ class Hero(db.Model):
             "hero_powers": [hp.to_dict() for hp in self.hero_powers]
         }
 
-class Power(db.Model):
+class Power(db.Model, SerializerMixin):
     __tablename__ = 'powers'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
     description = db.Column(db.String, nullable=False)
+    heroes = db.relationship('Hero', backref='power')
 
     @validates('description')
     def validate_description(self, key, description):
@@ -44,7 +55,7 @@ class Power(db.Model):
             "description": self.description
         }
 
-class HeroPower(db.Model):
+class HeroPower(db.Model, SerializerMixin):
     __tablename__ = 'hero_powers'
     id = db.Column(db.Integer, primary_key=True)
     strength = db.Column(db.String, nullable=False)

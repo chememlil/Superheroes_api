@@ -1,8 +1,11 @@
-from flask import Flask, jsonify, request, abort
+from flask import Flask, jsonify, request 
 from models import db, Hero, Power, HeroPower
+from flask_migrate import Migrate
+
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///superheroes.db'  # Update with your database URI
+migrate = Migrate(app, db)
 db.init_app(app)
 
 @app.route('/')
